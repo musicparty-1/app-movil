@@ -1,0 +1,37 @@
+name: musicparty
+description: Vota y sugiere canciones en eventos en vivo.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP client robusto con interceptores
+  dio: ^5.4.3
+
+  # Estado reactivo (polling, async state)
+  flutter_riverpod: ^2.5.1
+
+  # Persistencia local (deviceId)
+  shared_preferences: ^2.3.2
+
+  # Generación de UUID v4 para deviceId
+  uuid: ^4.4.0
+
+  # Portadas con caché y lazy loading
+  cached_network_image: ^3.3.1
+
+  # Escáner QR (para leer QR del DJ)
+  mobile_scanner: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
