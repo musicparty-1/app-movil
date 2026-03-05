@@ -50,7 +50,7 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
         Navigator.pop(context); // cierra el sheet
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Â¡"${result.title}" sugerida al DJ!'),
+            content: Text('¡"${result.title}" sugerida al DJ!'),
             backgroundColor: AppTheme.success,
             duration: const Duration(seconds: 2),
           ),
@@ -112,7 +112,7 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Sugerir canciÃ³n',
+                    'Sugerir canción',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -141,7 +141,7 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
                     controller: _searchController,
                     autofocus: true,
                     decoration: InputDecoration(
-                      hintText: 'Buscar canciÃ³n o artista...',
+                      hintText: 'Buscar canción o artista...',
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 20,

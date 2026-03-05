@@ -1,7 +1,7 @@
 /// URL base del backend.
 ///
 /// Configurable en compile-time:
-///   flutter run --dart-define=API_URL=https://mi-backend.railway.app/api
+///   flutter run --dart-define=API_URL=https://mi-backend.railway.app
 ///
 /// Valores por defecto según plataforma (se cambia en lib/config.dart):
 ///   Android emulador → 10.0.2.2 mapea al localhost del host
@@ -10,7 +10,15 @@
 class AppConfig {
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'http://10.0.2.2:3000/api',
+    defaultValue: 'http://127.0.0.1:3000',
+  );
+
+  /// ID del DJ cuya fiesta se muestra. Si está vacío, muestra todos los eventos.
+  /// Configurable en compile-time:
+  ///   flutter run --dart-define=DJ_ID=<uuid-del-dj>
+  static const String djId = String.fromEnvironment(
+    'DJ_ID',
+    defaultValue: '036ed25f-226f-4c73-bc0c-4273d929aa0d',
   );
 
   /// Timeout para peticiones de red (segundos)

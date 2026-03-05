@@ -98,7 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Vota en el evento ðŸŽµ',
+                  'Vota en el evento 🎵',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white70,
@@ -173,6 +173,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const Text(
                       'No se pudo cargar',
                       style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        e.toString(),
+                        style: const TextStyle(color: Colors.red, fontSize: 11),
+                        textAlign: TextAlign.center,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(

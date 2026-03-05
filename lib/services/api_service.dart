@@ -24,9 +24,16 @@ class ApiService {
 
   // ─── Eventos ──────────────────────────────────────────────────────────────
 
-  /// GET /eventos/publico — lista todos los eventos en estado 'live'.
+  /// GET /eventos/publico — lista eventos en estado 'live'.
+  /// Si [AppConfig.djId] está configurado, filtra solo los de ese DJ.
   Future<List<EventModel>> getPublicEvents() async {
-    final response = await _dio.get<List>('/eventos/publico');
+    final queryParams = AppConfig.djId.isNotEmpty
+        ? <String, dynamic>{'djId': AppConfig.djId}
+        : null;
+    final response = await _dio.get<List>(
+      '/eventos/publico',
+      queryParameters: queryParams,
+    );
     return (response.data ?? [])
         .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
         .toList();

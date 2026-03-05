@@ -144,13 +144,13 @@ class VotingScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 14),
                   const Text(
-                    'No hay canciones todavÃ­a',
+                    'No hay canciones todavía',
                     style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
                   ),
                   if (event.allowAudienceSuggestions) ...[
                     const SizedBox(height: 6),
                     const Text(
-                      'Â¡SÃ© el primero en sugerir una!',
+                      '¡Sé el primero en sugerir una!',
                       style: TextStyle(color: Colors.white30, fontSize: 13),
                     ),
                   ],
@@ -183,7 +183,7 @@ class VotingScreen extends ConsumerWidget {
               backgroundColor: AppTheme.neonPurple,
               icon: const Icon(Icons.add_rounded),
               label: const Text(
-                'Sugerir canciÃ³n',
+                'Sugerir canción',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
             )
@@ -220,7 +220,7 @@ class VotingScreen extends ConsumerWidget {
 
       if (context.mounted) {
         final msg = is409
-            ? 'Ya votaste por esta canciÃ³n'
+            ? 'Ya votaste por esta canción'
             : dioErrorToMessage(e);
 
         ScaffoldMessenger.of(context).showSnackBar(
