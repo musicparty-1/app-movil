@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +20,7 @@ class VotingScreen extends ConsumerWidget {
     final votedMap = ref.watch(votedSongsMapProvider);
     final votedSet = votedMap[eventId] ?? const {};
 
-    // ── Carga inicial ──────────────────────────────────────────────────────
+    // â”€â”€ Carga inicial â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (state.isLoading && state.event == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Cargando evento...')),
@@ -30,7 +30,7 @@ class VotingScreen extends ConsumerWidget {
       );
     }
 
-    // ── Error sin datos previos ────────────────────────────────────────────
+    // â”€â”€ Error sin datos previos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (state.error != null && state.event == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Error')),
@@ -71,7 +71,7 @@ class VotingScreen extends ConsumerWidget {
 
     final event = state.event!;
 
-    // Filtrar sólo canciones pendientes, ordenadas por votos (desc)
+    // Filtrar sÃ³lo canciones pendientes, ordenadas por votos (desc)
     final songs = (event.songs ?? <SongModel>[])
         .where((s) => s.status == 'pending')
         .toList()
@@ -80,7 +80,7 @@ class VotingScreen extends ConsumerWidget {
     final maxVotes = songs.isNotEmpty ? songs.first.voteCount : 1;
 
     return Scaffold(
-      // ── AppBar ────────────────────────────────────────────────────────────
+      // â”€â”€ AppBar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       appBar: AppBar(
         leading: const BackButton(),
         title: Column(
@@ -113,7 +113,7 @@ class VotingScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 14),
             child: Chip(
               visualDensity: VisualDensity.compact,
-              backgroundColor: AppTheme.neonPurple.withOpacity(0.15),
+              backgroundColor: AppTheme.neonPurple.withValues(alpha: 0.15),
               side: const BorderSide(
                 color: AppTheme.neonPurple,
                 width: 0.5,
@@ -131,7 +131,7 @@ class VotingScreen extends ConsumerWidget {
         ],
       ),
 
-      // ── Cuerpo ────────────────────────────────────────────────────────────
+      // â”€â”€ Cuerpo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       body: songs.isEmpty
           ? Center(
               child: Column(
@@ -144,13 +144,13 @@ class VotingScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 14),
                   const Text(
-                    'No hay canciones todavía',
+                    'No hay canciones todavÃ­a',
                     style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
                   ),
                   if (event.allowAudienceSuggestions) ...[
                     const SizedBox(height: 6),
                     const Text(
-                      '¡Sé el primero en sugerir una!',
+                      'Â¡SÃ© el primero en sugerir una!',
                       style: TextStyle(color: Colors.white30, fontSize: 13),
                     ),
                   ],
@@ -176,14 +176,14 @@ class VotingScreen extends ConsumerWidget {
               },
             ),
 
-      // ── FAB Sugerir ───────────────────────────────────────────────────────
+      // â”€â”€ FAB Sugerir â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       floatingActionButton: event.allowAudienceSuggestions
           ? FloatingActionButton.extended(
               onPressed: () => _openSuggestSheet(context),
               backgroundColor: AppTheme.neonPurple,
               icon: const Icon(Icons.add_rounded),
               label: const Text(
-                'Sugerir canción',
+                'Sugerir canciÃ³n',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
             )
@@ -191,7 +191,7 @@ class VotingScreen extends ConsumerWidget {
     );
   }
 
-  // ─── Lógica de voto ────────────────────────────────────────────────────────
+  // â”€â”€â”€ LÃ³gica de voto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Future<void> _vote(
     BuildContext context,
@@ -214,20 +214,20 @@ class VotingScreen extends ConsumerWidget {
       final is409 = e.response?.statusCode == 409;
 
       if (is409) {
-        // También marca localmente para deshabilitar el botón
+        // TambiÃ©n marca localmente para deshabilitar el botÃ³n
         _markVoted(ref, song.id);
       }
 
       if (context.mounted) {
         final msg = is409
-            ? 'Ya votaste por esta canción'
+            ? 'Ya votaste por esta canciÃ³n'
             : dioErrorToMessage(e);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(msg),
             backgroundColor: is409
-                ? AppTheme.neonPurple.withOpacity(0.9)
+                ? AppTheme.neonPurple.withValues(alpha: 0.9)
                 : AppTheme.errorColor,
             duration: const Duration(seconds: 2),
           ),
@@ -265,3 +265,4 @@ class VotingScreen extends ConsumerWidget {
     );
   }
 }
+

@@ -24,7 +24,7 @@ class AppTheme {
           onSurface: textPrimary,
           error: errorColor,
         ),
-        cardTheme: const CardTheme(
+        cardTheme: const CardThemeData(
           color: darkCard,
           elevation: 0,
           margin: EdgeInsets.zero,

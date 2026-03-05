@@ -1,24 +1,24 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../models/song_model.dart';
 import '../theme.dart';
 
-/// Ítem de la lista de votación.
+/// Ãtem de la lista de votaciÃ³n.
 ///
-/// Diseño:
-/// ┌──────────────────────────────────────────────────────────┐
-/// │ [barra de progreso de fondo, color neón translúcido]     │
-/// │  [portada]  Título            [♥ votos]                  │
-/// │             Artista · BPM                                │
-/// └──────────────────────────────────────────────────────────┘
+/// DiseÃ±o:
+/// â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+/// â”‚ [barra de progreso de fondo, color neÃ³n translÃºcido]     â”‚
+/// â”‚  [portada]  TÃ­tulo            [â™¥ votos]                  â”‚
+/// â”‚             Artista Â· BPM                                â”‚
+/// â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ///
-/// La barra de progreso usa el ancho relativo al máximo de votos del evento.
+/// La barra de progreso usa el ancho relativo al mÃ¡ximo de votos del evento.
 class SongTile extends StatelessWidget {
   final SongModel song;
   final bool isVoted;
 
-  /// 0.0 → 1.0, relativo a la canción con más votos del evento.
+  /// 0.0 â†’ 1.0, relativo a la canciÃ³n con mÃ¡s votos del evento.
   final double progress;
 
   final VoidCallback onVote;
@@ -37,7 +37,7 @@ class SongTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Stack(
         children: [
-          // ── Barra de progreso (fondo) ──────────────────────────────────
+          // â”€â”€ Barra de progreso (fondo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(13),
@@ -60,14 +60,14 @@ class SongTile extends StatelessWidget {
             ),
           ),
 
-          // ── Tarjeta con contenido ──────────────────────────────────────
+          // â”€â”€ Tarjeta con contenido â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
               border: Border.all(
                 color: isVoted
-                    ? AppTheme.neonPurple.withOpacity(0.55)
-                    : Colors.white.withOpacity(0.07),
+                    ? AppTheme.neonPurple.withValues(alpha: 0.55)
+                    : Colors.white.withValues(alpha: 0.07),
                 width: isVoted ? 1.5 : 1,
               ),
             ),
@@ -101,7 +101,7 @@ class SongTile extends StatelessWidget {
   }
 }
 
-// ─── Portada ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Portada â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _AlbumArt extends StatelessWidget {
   final String? coverUrl;
@@ -137,7 +137,7 @@ class _AlbumArt extends StatelessWidget {
       );
 }
 
-// ─── Subtítulo (artista + chip BPM) ───────────────────────────────────────────
+// â”€â”€â”€ SubtÃ­tulo (artista + chip BPM) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _Subtitle extends StatelessWidget {
   final SongModel song;
@@ -164,10 +164,10 @@ class _Subtitle extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             decoration: BoxDecoration(
-              color: AppTheme.neonCyan.withOpacity(0.12),
+              color: AppTheme.neonCyan.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
-                color: AppTheme.neonCyan.withOpacity(0.25),
+                color: AppTheme.neonCyan.withValues(alpha: 0.25),
               ),
             ),
             child: Text(
@@ -185,7 +185,7 @@ class _Subtitle extends StatelessWidget {
           Tooltip(
             message: song.suggestedBy != null
                 ? 'Sugerida por ${song.suggestedBy}'
-                : 'Sugerida por el público',
+                : 'Sugerida por el pÃºblico',
             child: const Icon(
               Icons.person_rounded,
               size: 12,
@@ -198,7 +198,7 @@ class _Subtitle extends StatelessWidget {
   }
 }
 
-// ─── Botón de voto ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ BotÃ³n de voto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _VoteButton extends StatelessWidget {
   final int voteCount;
@@ -220,18 +220,18 @@ class _VoteButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: isVoted
-              ? AppTheme.neonPurple.withOpacity(0.85)
-              : Colors.white.withOpacity(0.06),
+              ? AppTheme.neonPurple.withValues(alpha: 0.85)
+              : Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isVoted
                 ? AppTheme.neonPurple
-                : Colors.white.withOpacity(0.15),
+                : Colors.white.withValues(alpha: 0.15),
           ),
           boxShadow: isVoted
               ? [
                   BoxShadow(
-                    color: AppTheme.neonPurple.withOpacity(0.35),
+                    color: AppTheme.neonPurple.withValues(alpha: 0.35),
                     blurRadius: 8,
                     spreadRadius: 0,
                   )
@@ -261,3 +261,4 @@ class _VoteButton extends StatelessWidget {
     );
   }
 }
+

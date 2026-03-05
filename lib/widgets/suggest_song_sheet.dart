@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,7 +50,7 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
         Navigator.pop(context); // cierra el sheet
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('¡"${result.title}" sugerida al DJ!'),
+            content: Text('Â¡"${result.title}" sugerida al DJ!'),
             backgroundColor: AppTheme.success,
             duration: const Duration(seconds: 2),
           ),
@@ -92,27 +92,27 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
       builder: (context, scrollController) {
         return Column(
           children: [
-            // ── Asa ────────────────────────────────────────────────────────
+            // â”€â”€ Asa â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 10, bottom: 6),
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white20,
+                  color: const Color(0x33FFFFFF),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
 
-            // ── Cabecera + campos ─────────────────────────────────────────
+            // â”€â”€ Cabecera + campos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Padding(
               padding: EdgeInsets.fromLTRB(16, 2, 16, keyboardHeight > 0 ? 8 : 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Sugerir canción',
+                    'Sugerir canciÃ³n',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -136,12 +136,12 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Buscador de canción
+                  // Buscador de canciÃ³n
                   TextField(
                     controller: _searchController,
                     autofocus: true,
                     decoration: InputDecoration(
-                      hintText: 'Buscar canción o artista...',
+                      hintText: 'Buscar canciÃ³n o artista...',
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 20,
@@ -172,7 +172,7 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
 
             const Divider(height: 1, color: Colors.white10),
 
-            // ── Resultados ────────────────────────────────────────────────
+            // â”€â”€ Resultados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Expanded(
               child: searchState.when(
                 loading: () => const Center(
@@ -244,7 +244,7 @@ class _SuggestSongSheetState extends ConsumerState<SuggestSongSheet> {
   }
 }
 
-// ─── Ítem de resultado de búsqueda ────────────────────────────────────────────
+// â”€â”€â”€ Ãtem de resultado de bÃºsqueda â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SearchResultTile extends StatelessWidget {
   final SearchResultModel result;
@@ -285,7 +285,7 @@ class _SearchResultTile extends StatelessWidget {
       ),
       subtitle: Text(
         result.album != null
-            ? '${result.artist} · ${result.album}'
+            ? '${result.artist} Â· ${result.album}'
             : result.artist,
         style: const TextStyle(
           color: AppTheme.textSecondary,
@@ -298,7 +298,7 @@ class _SearchResultTile extends StatelessWidget {
         Icons.add_circle_outline_rounded,
         color: onTap != null
             ? AppTheme.neonPurple
-            : AppTheme.neonPurple.withOpacity(0.3),
+            : AppTheme.neonPurple.withValues(alpha: 0.3),
         size: 22,
       ),
     );
@@ -313,3 +313,4 @@ class _SearchResultTile extends StatelessWidget {
         ),
       );
 }
+

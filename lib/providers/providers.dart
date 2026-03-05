@@ -112,7 +112,7 @@ class VotingNotifier extends StateNotifier<VotingState> {
 
   void _startPolling() {
     _timer = Timer.periodic(
-      Duration(seconds: AppConfig.pollingIntervalSec),
+      const Duration(seconds: AppConfig.pollingIntervalSec),
       (_) => _poll(),
     );
   }

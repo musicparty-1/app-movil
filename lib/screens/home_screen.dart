@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/event_model.dart';
@@ -83,7 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Banner de entrada manual ──────────────────────────────────────
+          // â”€â”€ Banner de entrada manual â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
@@ -98,7 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Vota en el evento 🎵',
+                  'Vota en el evento ðŸŽµ',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white70,
@@ -140,7 +140,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // ── Título sección ────────────────────────────────────────────────
+          // â”€â”€ TÃ­tulo secciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 6),
             child: Text(
@@ -154,7 +154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // ── Lista de eventos ──────────────────────────────────────────────
+          // â”€â”€ Lista de eventos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Expanded(
             child: eventsAsync.when(
               loading: () => const Center(
@@ -239,7 +239,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// ─── Tarjeta de evento ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Tarjeta de evento â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _EventCard extends StatelessWidget {
   final EventModel event;
@@ -257,17 +257,17 @@ class _EventCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(14),
-          splashColor: AppTheme.neonPurple.withOpacity(0.1),
+          splashColor: AppTheme.neonPurple.withValues(alpha: 0.1),
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                // Ícono decorativo
+                // Ãcono decorativo
                 Container(
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: AppTheme.neonPurple.withOpacity(0.18),
+                    color: AppTheme.neonPurple.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -312,10 +312,10 @@ class _EventCard extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.liveGreen.withOpacity(0.15),
+                    color: AppTheme.liveGreen.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: AppTheme.liveGreen.withOpacity(0.3),
+                      color: AppTheme.liveGreen.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -355,3 +355,4 @@ class _EventCard extends StatelessWidget {
     );
   }
 }
+
