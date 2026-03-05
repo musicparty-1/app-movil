@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../theme.dart';
+import 'home_screen.dart';
+import 'voting_screen.dart';
 
 /// Pantalla de escaneo QR.
 ///
@@ -18,7 +20,9 @@ import '../theme.dart';
 ///     <key>NSCameraUsageDescription</key>
 ///     <string>Necesitamos la cámara para escanear el QR del evento</string>
 class QrScanScreen extends StatefulWidget {
-  const QrScanScreen({super.key});
+  final bool isHome;
+
+  const QrScanScreen({super.key, this.isHome = false});
 
   @override
   State<QrScanScreen> createState() => _QrScanScreenState();
@@ -66,7 +70,16 @@ class _QrScanScreenState extends State<QrScanScreen> {
       if (eventId != null) {
         _handled = true;
         _controller.stop();
-        Navigator.pop(context, eventId);
+        if (widget.isHome) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => VotingScreen(eventId: eventId!),
+            ),
+          );
+        } else {
+          Navigator.pop(context, eventId);
+        }
         return;
       }
     }
@@ -122,16 +135,38 @@ class _QrScanScreenState extends State<QrScanScreen> {
           ),
 
           // ── Instrucción ───────────────────────────────────────────────────
-          const Align(
+          Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: EdgeInsets.only(bottom: 64),
-              child: Text(
-                'Apunta al código QR del evento',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+              padding: const EdgeInsets.only(bottom: 48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Apunta al código QR del evento',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (widget.isHome) ...[
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeScreen(),
+                        ),
+                      ),
+                      icon: const Icon(Icons.list_rounded, size: 18),
+                      label: const Text('Ver lista de eventos'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.darkCard,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),

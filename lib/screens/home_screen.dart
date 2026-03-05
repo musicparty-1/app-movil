@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/event_model.dart';
 import '../providers/providers.dart';
 import '../theme.dart';
+import '../widgets/skeleton_loader.dart';
 import 'voting_screen.dart';
 import 'qr_scan_screen.dart';
 
@@ -157,8 +158,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // â”€â”€ Lista de eventos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Expanded(
             child: eventsAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppTheme.neonPurple),
+              loading: () => ListView.builder(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 80),
+                itemCount: 5,
+                itemBuilder: (_, __) => const SkeletonEventCard(),
               ),
               error: (e, _) => Center(
                 child: Column(
@@ -307,15 +310,21 @@ class _EventCardState extends State<_EventCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.event.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 15,
+                      Hero(
+                        tag: 'event-name-${widget.event.id}',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Text(
+                            widget.event.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(

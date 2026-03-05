@@ -1,5 +1,6 @@
 ﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/song_model.dart';
 import '../theme.dart';
@@ -23,20 +24,37 @@ class SongTile extends StatelessWidget {
 
   final VoidCallback onVote;
 
+  /// Posición en el ranking (1 = primero). 0 = sin badge.
+  final int position;
+
+  /// Votos máximos del evento (para calcular diferencia).
+  final int topVotes;
+
   const SongTile({
     super.key,
     required this.song,
     required this.isVoted,
     required this.progress,
     required this.onVote,
+    this.position = 0,
+    this.topVotes = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Stack(
-        children: [
+    return GestureDetector(
+      onLongPress: () => _showSpotifyMenu(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Row(
+          children: [
+            if (position > 0) ...[
+              _PositionBadge(position: position),
+              const SizedBox(width: 6),
+            ],
+            Expanded(
+              child: Stack(
+                children: [
           // â”€â”€ Barra de progreso (fondo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Positioned.fill(
             child: ClipRRect(
@@ -87,7 +105,11 @@ class SongTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              subtitle: _Subtitle(song: song),
+              subtitle: _Subtitle(
+                song: song,
+                position: position,
+                topVotes: topVotes,
+              ),
               trailing: _VoteButton(
                 voteCount: song.voteCount,
                 isVoted: isVoted,
@@ -97,7 +119,86 @@ class SongTile extends StatelessWidget {
           ),
         ],
       ),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  void _showSpotifyMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              song.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              song.artist,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              tileColor: const Color(0xFF1DB954).withValues(alpha: 0.08),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1DB954).withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.open_in_new_rounded,
+                  color: Color(0xFF1DB954),
+                  size: 20,
+                ),
+              ),
+              title: const Text(
+                'Buscar en Spotify',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: const Text(
+                'Abre la búsqueda en el navegador',
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _openSpotify();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openSpotify() async {
+    final query = Uri.encodeComponent('${song.title} ${song.artist}');
+    final uri = Uri.parse('https://open.spotify.com/search/$query');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
 
@@ -141,58 +242,79 @@ class _AlbumArt extends StatelessWidget {
 
 class _Subtitle extends StatelessWidget {
   final SongModel song;
+  final int position;
+  final int topVotes;
 
-  const _Subtitle({required this.song});
+  const _Subtitle({
+    required this.song,
+    this.position = 0,
+    this.topVotes = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final diff = topVotes - song.voteCount;
+    final showDiff = position > 1 && diff > 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
-          child: Text(
-            song.artist,
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
-              fontSize: 13,
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                song.artist,
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+            if (song.bpm != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppTheme.neonCyan.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: AppTheme.neonCyan.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Text(
+                  '${song.bpm!.toStringAsFixed(0)} BPM',
+                  style: const TextStyle(
+                    fontSize: 9,
+                    color: AppTheme.neonCyan,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+            if (song.addedBy == 'audience') ...[
+              const SizedBox(width: 4),
+              Tooltip(
+                message: song.suggestedBy != null
+                    ? 'Sugerida por ${song.suggestedBy}'
+                    : 'Sugerida por el público',
+                child: const Icon(
+                  Icons.person_rounded,
+                  size: 12,
+                  color: Colors.white30,
+                ),
+              ),
+            ],
+          ],
         ),
-        if (song.bpm != null) ...[
-          const SizedBox(width: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppTheme.neonCyan.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: AppTheme.neonCyan.withValues(alpha: 0.25),
-              ),
-            ),
-            child: Text(
-              '${song.bpm!.toStringAsFixed(0)} BPM',
-              style: const TextStyle(
-                fontSize: 9,
-                color: AppTheme.neonCyan,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+        if (showDiff)
+          Text(
+            '−$diff vs #1',
+            style: const TextStyle(color: Colors.white24, fontSize: 10),
           ),
-        ],
-        if (song.addedBy == 'audience') ...[
-          const SizedBox(width: 4),
-          Tooltip(
-            message: song.suggestedBy != null
-                ? 'Sugerida por ${song.suggestedBy}'
-                : 'Sugerida por el pÃºblico',
-            child: const Icon(
-              Icons.person_rounded,
-              size: 12,
-              color: Colors.white30,
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -262,3 +384,39 @@ class _VoteButton extends StatelessWidget {
   }
 }
 
+// ─── Badge de posición ────────────────────────────────────────────────────────────────
+
+class _PositionBadge extends StatelessWidget {
+  final int position;
+
+  const _PositionBadge({required this.position});
+
+  @override
+  Widget build(BuildContext context) {
+    if (position <= 3) {
+      final emojis = ['🥇', '🥈', '🥉'];
+      return SizedBox(
+        width: 28,
+        child: Center(
+          child: Text(
+            emojis[position - 1],
+            style: const TextStyle(fontSize: 18),
+          ),
+        ),
+      );
+    }
+    return SizedBox(
+      width: 28,
+      child: Center(
+        child: Text(
+          '#$position',
+          style: const TextStyle(
+            color: Colors.white30,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
