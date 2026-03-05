@@ -1,5 +1,6 @@
 ﻿import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/song_model.dart';
@@ -70,14 +71,22 @@ class VotingScreen extends ConsumerWidget {
     }
 
     final event = state.event!;
+    final eventTheme = AppTheme.eventThemeFor(event.eventType);
 
-    // Filtrar sÃ³lo canciones pendientes, ordenadas por votos (desc)
-    final songs = (event.songs ?? <SongModel>[])
+    // Canciones pendientes ordenadas por votos (desc)
+    final pendingSongs = (event.songs ?? <SongModel>[])
         .where((s) => s.status == 'pending')
         .toList()
       ..sort((a, b) => b.voteCount.compareTo(a.voteCount));
 
-    final maxVotes = songs.isNotEmpty ? songs.first.voteCount : 1;
+    // Canciones ya reproducidas (la más reciente primero)
+    final playedSongs = (event.songs ?? <SongModel>[])
+        .where((s) => s.status == 'played')
+        .toList()
+      ..sort((a, b) => b.orderIndex.compareTo(a.orderIndex));
+
+    final nowPlaying = playedSongs.isNotEmpty ? playedSongs.first : null;
+    final maxVotes = pendingSongs.isNotEmpty ? pendingSongs.first.voteCount : 1;
 
     return Scaffold(
       // â”€â”€ AppBar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -98,8 +107,8 @@ class VotingScreen extends ConsumerWidget {
             ),
             Text(
               event.venue,
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
+              style: TextStyle(
+                color: eventTheme.accent.withValues(alpha: 0.85),
                 fontSize: 11,
               ),
               maxLines: 1,
@@ -108,20 +117,31 @@ class VotingScreen extends ConsumerWidget {
           ],
         ),
         actions: [
-          // Indicador de canciones
+          // Botón compartir — copia el ID al portapapeles
+          IconButton(
+            icon: const Icon(Icons.share_rounded, size: 20),
+            tooltip: 'Copiar ID del evento',
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: event.id));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('ID copiado: ${event.id.substring(0, 8)}...'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+          ),
+          // Chip contador de canciones
           Padding(
-            padding: const EdgeInsets.only(right: 14),
+            padding: const EdgeInsets.only(right: 12),
             child: Chip(
               visualDensity: VisualDensity.compact,
-              backgroundColor: AppTheme.neonPurple.withValues(alpha: 0.15),
-              side: const BorderSide(
-                color: AppTheme.neonPurple,
-                width: 0.5,
-              ),
+              backgroundColor: eventTheme.accent.withValues(alpha: 0.15),
+              side: BorderSide(color: eventTheme.accent, width: 0.5),
               label: Text(
-                '${songs.length} canciones',
-                style: const TextStyle(
-                  color: AppTheme.neonPurple,
+                '${pendingSongs.length} canciones',
+                style: TextStyle(
+                  color: eventTheme.accent,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -132,55 +152,68 @@ class VotingScreen extends ConsumerWidget {
       ),
 
       // â”€â”€ Cuerpo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-      body: songs.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.queue_music_rounded,
-                    size: 56,
-                    color: Colors.white12,
-                  ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'No hay canciones todavía',
-                    style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
-                  ),
-                  if (event.allowAudienceSuggestions) ...[
-                    const SizedBox(height: 6),
-                    const Text(
-                      '¡Sé el primero en sugerir una!',
-                      style: TextStyle(color: Colors.white30, fontSize: 13),
-                    ),
-                  ],
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 100),
-              itemCount: songs.length,
-              itemBuilder: (_, i) {
-                final song = songs[i];
-                final isVoted = votedSet.contains(song.id);
-                final progress =
-                    maxVotes > 0 ? song.voteCount / maxVotes : 0.0;
+      body: Column(
+        children: [
+          // Sonando Ahora
+          if (nowPlaying != null)
+            _NowPlayingBanner(song: nowPlaying, theme: eventTheme),
 
-                return SongTile(
-                  key: ValueKey(song.id),
-                  song: song,
-                  isVoted: isVoted,
-                  progress: progress.clamp(0.0, 1.0),
-                  onVote: () => _vote(context, ref, song),
-                );
-              },
-            ),
+          // Lista de canciones o empty state
+          Expanded(
+            child: pendingSongs.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.queue_music_rounded,
+                          size: 56,
+                          color: eventTheme.accent.withValues(alpha: 0.2),
+                        ),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'No hay canciones todavía',
+                          style: TextStyle(
+                              color: AppTheme.textSecondary, fontSize: 16),
+                        ),
+                        if (event.allowAudienceSuggestions) ...[
+                          const SizedBox(height: 6),
+                          const Text(
+                            '¡Sé el primero en sugerir una!',
+                            style:
+                                TextStyle(color: Colors.white30, fontSize: 13),
+                          ),
+                        ],
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 100),
+                    itemCount: pendingSongs.length,
+                    itemBuilder: (_, i) {
+                      final song = pendingSongs[i];
+                      final isVoted = votedSet.contains(song.id);
+                      final progress =
+                          maxVotes > 0 ? song.voteCount / maxVotes : 0.0;
+
+                      return SongTile(
+                        key: ValueKey(song.id),
+                        song: song,
+                        isVoted: isVoted,
+                        progress: progress.clamp(0.0, 1.0),
+                        onVote: () => _vote(context, ref, song),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
 
       // â”€â”€ FAB Sugerir â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       floatingActionButton: event.allowAudienceSuggestions
           ? FloatingActionButton.extended(
               onPressed: () => _openSuggestSheet(context),
-              backgroundColor: AppTheme.neonPurple,
+              backgroundColor: eventTheme.accent,
               icon: const Icon(Icons.add_rounded),
               label: const Text(
                 'Sugerir canción',
@@ -262,6 +295,83 @@ class VotingScreen extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => SuggestSongSheet(eventId: eventId),
+    );
+  }
+}
+
+// ─── Sonando Ahora ────────────────────────────────────────────────────────────
+class _NowPlayingBanner extends StatelessWidget {
+  final SongModel song;
+  final EventThemeData theme;
+
+  const _NowPlayingBanner({required this.song, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.accent.withValues(alpha: 0.25),
+            theme.neon.withValues(alpha: 0.08),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.accent.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          // Indicador de música
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: theme.accent.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.music_note_rounded, color: theme.accent, size: 16),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SONANDO AHORA',
+                  style: TextStyle(
+                    color: theme.accent,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  song.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  song.artist,
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.graphic_eq_rounded, color: theme.accent, size: 22),
+        ],
+      ),
     );
   }
 }

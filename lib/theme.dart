@@ -89,4 +89,34 @@ class AppTheme {
           behavior: SnackBarBehavior.floating,
         ),
       );
+
+  // ─── Temas por tipo de evento ────────────────────────────────────────────────────
+  static const Map<String, EventThemeData> _eventThemes = {
+    'club':      EventThemeData(accent: Color(0xFF6B3FFF), neon: Color(0xFF00F2FF), emoji: '🎧'),
+    'wedding':   EventThemeData(accent: Color(0xFFD53F8C), neon: Color(0xFFFBD38D), emoji: '💍'),
+    'private':   EventThemeData(accent: Color(0xFF48BB78), neon: Color(0xFF9AE6B4), emoji: '🔒'),
+    'festival':  EventThemeData(accent: Color(0xFFED8936), neon: Color(0xFFF6E05E), emoji: '🎪'),
+    'corporate': EventThemeData(accent: Color(0xFF4299E1), neon: Color(0xFF90CDF4), emoji: '🏢'),
+  };
+
+  static EventThemeData eventThemeFor(String? type) =>
+      _eventThemes[type] ??
+      const EventThemeData(
+        accent: Color(0xFF6B3FFF),
+        neon: Color(0xFF00F2FF),
+        emoji: '🎵',
+      );
+}
+
+// ─── Datos de tema por tipo de evento ──────────────────────────────────────────────────
+class EventThemeData {
+  final Color accent;
+  final Color neon;
+  final String emoji;
+
+  const EventThemeData({
+    required this.accent,
+    required this.neon,
+    required this.emoji,
+  });
 }

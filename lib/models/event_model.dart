@@ -14,6 +14,9 @@ class EventModel {
   /// Solo presente en el detalle GET /eventos/:id
   final List<SongModel>? songs;
 
+  /// 'club' | 'wedding' | 'private' | 'festival' | 'corporate' | 'other' | null
+  final String? eventType;
+
   final bool allowAudienceSuggestions;
 
   const EventModel({
@@ -22,6 +25,7 @@ class EventModel {
     required this.venue,
     required this.status,
     required this.createdAt,
+    this.eventType,
     this.songs,
     this.allowAudienceSuggestions = true,
   });
@@ -33,6 +37,7 @@ class EventModel {
       venue: json['venue'] as String,
       status: json['status'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      eventType: json['eventType'] as String?,
       allowAudienceSuggestions:
           json['allowAudienceSuggestions'] as bool? ?? true,
       songs: json['songs'] != null

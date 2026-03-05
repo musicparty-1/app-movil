@@ -174,17 +174,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       'No se pudo cargar',
                       style: TextStyle(color: AppTheme.textSecondary),
                     ),
-                    const SizedBox(height: 6),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        e.toString(),
-                        style: const TextStyle(color: Colors.red, fontSize: 11),
-                        textAlign: TextAlign.center,
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
                       onPressed: () =>
@@ -252,39 +241,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 // â”€â”€â”€ Tarjeta de evento â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-class _EventCard extends StatelessWidget {
+class _EventCard extends StatefulWidget {
   final EventModel event;
   final VoidCallback onTap;
 
   const _EventCard({required this.event, required this.onTap});
 
   @override
+  State<_EventCard> createState() => _EventCardState();
+}
+
+class _EventCardState extends State<_EventCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.eventThemeFor(widget.event.eventType);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Material(
         color: AppTheme.darkCard,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
-          onTap: onTap,
+          onTap: widget.onTap,
           borderRadius: BorderRadius.circular(14),
-          splashColor: AppTheme.neonPurple.withValues(alpha: 0.1),
+          splashColor: theme.accent.withValues(alpha: 0.12),
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                // Ãcono decorativo
+                // Emoji del tipo de evento
                 Container(
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: AppTheme.neonPurple.withValues(alpha: 0.18),
+                    color: theme.accent.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.equalizer_rounded,
-                    color: AppTheme.neonPurple,
-                    size: 22,
+                  child: Center(
+                    child: Text(
+                      theme.emoji,
+                      style: const TextStyle(fontSize: 22),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -294,7 +308,7 @@ class _EventCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        event.name,
+                        widget.event.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -305,9 +319,9 @@ class _EventCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        event.venue,
-                        style: const TextStyle(
-                          color: AppTheme.textSecondary,
+                        widget.event.venue,
+                        style: TextStyle(
+                          color: theme.accent.withValues(alpha: 0.85),
                           fontSize: 13,
                         ),
                         maxLines: 1,
@@ -316,41 +330,55 @@ class _EventCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Badge EN VIVO
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.liveGreen.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: AppTheme.liveGreen.withValues(alpha: 0.3),
+                // Badge EN VIVO pulsante
+                AnimatedBuilder(
+                  animation: _pulse,
+                  builder: (_, __) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 5,
-                        height: 5,
-                        decoration: const BoxDecoration(
-                          color: AppTheme.liveGreen,
-                          shape: BoxShape.circle,
-                        ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.liveGreen.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: AppTheme.liveGreen.withValues(alpha: 0.3),
                       ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        'EN VIVO',
-                        style: TextStyle(
-                          color: AppTheme.liveGreen,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: AppTheme.liveGreen.withValues(
+                              alpha: 0.4 + _pulse.value * 0.6,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.liveGreen.withValues(
+                                  alpha: _pulse.value * 0.5,
+                                ),
+                                blurRadius: 4,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 5),
+                        const Text(
+                          'EN VIVO',
+                          style: TextStyle(
+                            color: AppTheme.liveGreen,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
