@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🎧 MusicParty (Emulador - localhost)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=API_URL=http://10.0.2.2:3000"
+      ]
+    },
+    {
+      "name": "🌐 MusicParty (Ngrok - editar URL)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=API_URL=https://TU-DOMINIO.ngrok-free.app"
+      ],
+      "comment": "Reemplaza TU-DOMINIO con tu Static Domain de Ngrok"
+    },
+    {
+      "name": "📶 MusicParty (IP local WiFi)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=API_URL=http://192.168.1.X:3000"
+      ],
+      "comment": "Reemplaza 192.168.1.X con la IP de tu PC en la red local"
+    }
+  ]
+}
