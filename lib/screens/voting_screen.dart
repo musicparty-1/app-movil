@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/song_model.dart';
 import '../providers/providers.dart';
 import '../screens/now_playing_screen.dart';
+import '../screens/ranking_screen.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/skeleton_loader.dart';
@@ -137,6 +138,16 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
         elevation: 0,
         leading: const BackButton(),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.emoji_events_rounded, size: 22),
+            tooltip: 'Ranking',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RankingScreen(eventId: widget.eventId),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.share_rounded, size: 20),
             tooltip: 'Copiar ID',
