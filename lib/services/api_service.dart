@@ -15,7 +15,10 @@ class ApiService {
         baseUrl: AppConfig.baseUrl,
         connectTimeout: const Duration(seconds: AppConfig.connectTimeoutSec),
         receiveTimeout: const Duration(seconds: AppConfig.receiveTimeoutSec),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
       ),
     );
   }

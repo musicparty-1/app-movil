@@ -138,22 +138,33 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
         eventId: widget.eventId,
         accent: eventTheme.accent,
       ),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: const BackButton(),
-        actions: [
-          if (event.allowAudienceSuggestions)
-            IconButton(
-              icon: const Icon(Icons.queue_music_rounded, size: 22),
-              tooltip: 'Sugerir canción',
+      floatingActionButton: event.allowAudienceSuggestions
+          ? FloatingActionButton.extended(
               onPressed: () => showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 builder: (_) => SuggestSongSheet(eventId: widget.eventId),
               ),
-            ),
+              backgroundColor: AppTheme.neonPurple,
+              elevation: 8,
+              icon: const Icon(Icons.queue_music_rounded,
+                  color: Colors.white, size: 20),
+              label: const Text(
+                'Sugerir',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+              ),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: const BackButton(),
+        actions: [
           IconButton(
             icon: const Icon(Icons.emoji_events_rounded, size: 22),
             tooltip: 'Ranking',

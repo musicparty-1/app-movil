@@ -123,6 +123,30 @@ class VotingNotifier extends StateNotifier<VotingState> {
     await _load();
   }
 
+  /// Actualización optimista: +1 al voteCount de la canción votada.
+  /// El poll siguiente sobreescribirá con el valor real del servidor.
+  void incrementVote(String songId) {
+    final event = state.event;
+    if (event == null) return;
+    final songs = event.songs?.map((s) {
+      return s.id == songId ? s.copyWith(voteCount: s.voteCount + 1) : s;
+    }).toList();
+    if (mounted) {
+      state = state.copyWith(
+        event: EventModel(
+          id: event.id,
+          name: event.name,
+          venue: event.venue,
+          status: event.status,
+          eventType: event.eventType,
+          allowAudienceSuggestions: event.allowAudienceSuggestions,
+          createdAt: event.createdAt,
+          songs: songs,
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();

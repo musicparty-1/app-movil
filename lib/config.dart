@@ -10,7 +10,7 @@
 class AppConfig {
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'http://127.0.0.1:3000',
+    defaultValue: 'https://tonnishly-nonbinding-lura.ngrok-free.dev',
   );
 
   /// ID del DJ cuya fiesta se muestra. Si está vacío, muestra todos los eventos.
