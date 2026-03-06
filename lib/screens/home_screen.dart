@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/event_model.dart';
 import '../providers/providers.dart';
+import '../services/geo_service.dart';
 import '../theme.dart';
 import '../widgets/skeleton_loader.dart';
 import 'voting_screen.dart';
@@ -34,6 +35,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(eventsProvider);
+    final geoAsync = ref.watch(userPositionProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -152,17 +154,51 @@ class HomeScreen extends ConsumerWidget {
                   );
                 }
 
+                // Calcular distancias si hay posición disponible
+                GeoPosition? userPos;
+                if (geoAsync is AsyncData<GeoResult>) {
+                  final r = geoAsync.value;
+                  if (r is GeoPosition) userPos = r;
+                }
+
+                // Ordenar: primero los cercanos (si tiene coordenadas), luego el resto
+                final sorted = List<EventModel>.from(events);
+                if (userPos != null) {
+                  sorted.sort((a, b) {
+                    final da = (a.latitude != null && a.longitude != null)
+                        ? haversineMeters(userPos!.lat, userPos.lng,
+                            a.latitude!, a.longitude!)
+                        : double.infinity;
+                    final db = (b.latitude != null && b.longitude != null)
+                        ? haversineMeters(userPos!.lat, userPos.lng,
+                            b.latitude!, b.longitude!)
+                        : double.infinity;
+                    return da.compareTo(db);
+                  });
+                }
+
                 return RefreshIndicator(
                   color: AppTheme.neonPurple,
                   backgroundColor: AppTheme.darkCard,
                   onRefresh: () => ref.read(eventsProvider.notifier).refresh(),
                   child: ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-                    itemCount: events.length,
-                    itemBuilder: (_, i) => _EventCard(
-                      event: events[i],
-                      onTap: () => _goToEvent(context, events[i].id),
-                    ),
+                    itemCount: sorted.length,
+                    itemBuilder: (_, i) {
+                      final event = sorted[i];
+                      double? distM;
+                      if (userPos != null &&
+                          event.latitude != null &&
+                          event.longitude != null) {
+                        distM = haversineMeters(userPos.lat, userPos.lng,
+                            event.latitude!, event.longitude!);
+                      }
+                      return _EventCard(
+                        event: event,
+                        distanceMeters: distM,
+                        onTap: () => _goToEvent(context, event.id),
+                      );
+                    },
                   ),
                 );
               },
@@ -178,9 +214,11 @@ class HomeScreen extends ConsumerWidget {
 
 class _EventCard extends StatefulWidget {
   final EventModel event;
+  final double? distanceMeters;
   final VoidCallback onTap;
 
-  const _EventCard({required this.event, required this.onTap});
+  const _EventCard(
+      {required this.event, required this.onTap, this.distanceMeters});
 
   @override
   State<_EventCard> createState() => _EventCardState();
@@ -285,8 +323,8 @@ class _EventCardState extends State<_EventCard>
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 3),
                               decoration: BoxDecoration(
-                                color: AppTheme.liveGreen
-                                    .withValues(alpha: 0.12),
+                                color:
+                                    AppTheme.liveGreen.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
                                   color: AppTheme.liveGreen
@@ -326,6 +364,7 @@ class _EventCardState extends State<_EventCard>
                                 ],
                               ),
                             ),
+                            // Genre badge
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -334,8 +373,7 @@ class _EventCardState extends State<_EventCard>
                                 color: theme.accent.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color:
-                                      theme.accent.withValues(alpha: 0.35),
+                                  color: theme.accent.withValues(alpha: 0.35),
                                   width: 0.8,
                                 ),
                               ),
@@ -349,6 +387,56 @@ class _EventCardState extends State<_EventCard>
                                 ),
                               ),
                             ),
+                            if (widget.distanceMeters != null) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 7, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: widget.distanceMeters! < 300
+                                      ? AppTheme.liveGreen
+                                          .withValues(alpha: 0.15)
+                                      : Colors.white.withValues(alpha: 0.07),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: widget.distanceMeters! < 300
+                                        ? AppTheme.liveGreen
+                                            .withValues(alpha: 0.4)
+                                        : Colors.white.withValues(alpha: 0.12),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      widget.distanceMeters! < 300
+                                          ? Icons.near_me_rounded
+                                          : Icons.location_on_rounded,
+                                      size: 9,
+                                      color: widget.distanceMeters! < 300
+                                          ? AppTheme.liveGreen
+                                          : AppTheme.textSecondary,
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      widget.distanceMeters! < 300
+                                          ? '\u00a1Estás aquí!'
+                                          : formatDistance(
+                                              widget.distanceMeters!),
+                                      style: TextStyle(
+                                        color: widget.distanceMeters! < 300
+                                            ? AppTheme.liveGreen
+                                            : AppTheme.textSecondary,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                         const Spacer(),
@@ -415,8 +503,7 @@ class _EventCardState extends State<_EventCard>
                                   vertical: 8,
                                 ),
                                 minimumSize: Size.zero,
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),

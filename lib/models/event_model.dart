@@ -19,6 +19,10 @@ class EventModel {
 
   final bool allowAudienceSuggestions;
 
+  /// Coordenadas del venue (opcionales — requieren que el DJ las haya configurado)
+  final double? latitude;
+  final double? longitude;
+
   const EventModel({
     required this.id,
     required this.name,
@@ -28,6 +32,8 @@ class EventModel {
     this.eventType,
     this.songs,
     this.allowAudienceSuggestions = true,
+    this.latitude,
+    this.longitude,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +46,8 @@ class EventModel {
       eventType: json['eventType'] as String?,
       allowAudienceSuggestions:
           json['allowAudienceSuggestions'] as bool? ?? true,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       songs: json['songs'] != null
           ? (json['songs'] as List)
               .map((s) => SongModel.fromJson(s as Map<String, dynamic>))

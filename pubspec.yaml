@@ -31,6 +31,9 @@ dependencies:
   # Abrir URLs externas (Spotify deep link)
   url_launcher: ^6.2.6
 
+  # Geolocalización del usuario (distancia al evento)
+  geolocator: ^13.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
