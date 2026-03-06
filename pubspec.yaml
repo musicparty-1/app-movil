@@ -34,6 +34,9 @@ dependencies:
   # Geolocalización del usuario (distancia al evento)
   geolocator: ^13.0.2
 
+  # Deep linking — abrir app desde QR del evento
+  app_links: ^6.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
