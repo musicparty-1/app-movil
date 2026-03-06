@@ -72,13 +72,12 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
                   size: 48, color: Colors.white24),
               const SizedBox(height: 12),
               const Text('Sin conexión',
-                  style: TextStyle(
-                      color: AppTheme.textSecondary, fontSize: 16)),
+                  style:
+                      TextStyle(color: AppTheme.textSecondary, fontSize: 16)),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () => ref
-                    .read(votingProvider(widget.eventId).notifier)
-                    .refresh(),
+                onPressed: () =>
+                    ref.read(votingProvider(widget.eventId).notifier).refresh(),
                 icon: const Icon(Icons.refresh, size: 16),
                 label: const Text('Reintentar'),
               ),
@@ -137,13 +136,9 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
 
   /// Top Picks: pendientes primero (más votos), luego played
   List<SongModel> _topPicks(List<SongModel> songs) {
-    final pending = songs
-        .where((s) => s.status == 'pending')
-        .toList()
+    final pending = songs.where((s) => s.status == 'pending').toList()
       ..sort((a, b) => b.voteCount.compareTo(a.voteCount));
-    final played = songs
-        .where((s) => s.status == 'played')
-        .toList()
+    final played = songs.where((s) => s.status == 'played').toList()
       ..sort((a, b) => b.voteCount.compareTo(a.voteCount));
     return [...pending, ...played];
   }
@@ -161,10 +156,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
     final now = DateTime.now();
     final pending = songs.where((s) => s.status == 'pending').toList();
     pending.sort((a, b) {
-      final minA =
-          now.difference(a.createdAt).inMinutes.clamp(1, 99999);
-      final minB =
-          now.difference(b.createdAt).inMinutes.clamp(1, 99999);
+      final minA = now.difference(a.createdAt).inMinutes.clamp(1, 99999);
+      final minB = now.difference(b.createdAt).inMinutes.clamp(1, 99999);
       final rateA = a.voteCount / minA;
       final rateB = b.voteCount / minB;
       return rateB.compareTo(rateA);
@@ -252,8 +245,7 @@ class _HeaderContent extends StatelessWidget {
                   children: [
                     Icon(Icons.location_on_rounded,
                         size: 12,
-                        color:
-                            eventTheme.accent.withValues(alpha: 0.8)),
+                        color: eventTheme.accent.withValues(alpha: 0.8)),
                     const SizedBox(width: 3),
                     Text(
                       event.venue,
@@ -310,8 +302,8 @@ class _TabRow extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-              color: Colors.white.withValues(alpha: 0.08), width: 1),
+          bottom:
+              BorderSide(color: Colors.white.withValues(alpha: 0.08), width: 1),
         ),
       ),
       child: TabBar(
@@ -325,9 +317,7 @@ class _TabRow extends StatelessWidget {
           fontWeight: FontWeight.bold,
           letterSpacing: 0.8,
         ),
-        tabs: _RankMode.values
-            .map((m) => Tab(text: m.label))
-            .toList(),
+        tabs: _RankMode.values.map((m) => Tab(text: m.label)).toList(),
       ),
     );
   }
@@ -354,13 +344,11 @@ class _RankList extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.bar_chart_rounded,
-                size: 52,
-                color: eventTheme.accent.withValues(alpha: 0.2)),
+                size: 52, color: eventTheme.accent.withValues(alpha: 0.2)),
             const SizedBox(height: 14),
             const Text(
               'Sin canciones todavía',
-              style:
-                  TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
             ),
           ],
         ),
@@ -371,8 +359,7 @@ class _RankList extends StatelessWidget {
       builder: (context) => CustomScrollView(
         slivers: [
           SliverOverlapInjector(
-            handle:
-                NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
@@ -428,8 +415,7 @@ class _RankRow extends StatelessWidget {
               // Posición
               SizedBox(
                 width: 34,
-                child: _PositionWidget(
-                    position: position, theme: eventTheme),
+                child: _PositionWidget(position: position, theme: eventTheme),
               ),
               const SizedBox(width: 10),
 
@@ -442,8 +428,7 @@ class _RankRow extends StatelessWidget {
                         width: 48,
                         height: 48,
                         fit: BoxFit.cover,
-                        errorWidget: (_, __, ___) =>
-                            _Cover(theme: eventTheme),
+                        errorWidget: (_, __, ___) => _Cover(theme: eventTheme),
                       )
                     : _Cover(theme: eventTheme),
               ),
@@ -459,9 +444,7 @@ class _RankRow extends StatelessWidget {
                       style: TextStyle(
                         color: isTop3 ? Colors.white : Colors.white,
                         fontSize: 13,
-                        fontWeight: isTop3
-                            ? FontWeight.bold
-                            : FontWeight.w500,
+                        fontWeight: isTop3 ? FontWeight.bold : FontWeight.w500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -570,9 +553,7 @@ class _MetricChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              showTrend
-                  ? Icons.trending_up_rounded
-                  : Icons.favorite_rounded,
+              showTrend ? Icons.trending_up_rounded : Icons.favorite_rounded,
               size: 13,
               color: showTrend ? AppTheme.neonCyan : theme.accent,
             ),
@@ -590,8 +571,7 @@ class _MetricChip extends StatelessWidget {
         const SizedBox(height: 3),
         // Badge estado
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: isPlayed
                 ? Colors.white.withValues(alpha: 0.08)
@@ -601,9 +581,7 @@ class _MetricChip extends StatelessWidget {
           child: Text(
             isPlayed ? 'SONÓ' : 'EN COLA',
             style: TextStyle(
-              color: isPlayed
-                  ? AppTheme.textSecondary
-                  : theme.accent,
+              color: isPlayed ? AppTheme.textSecondary : theme.accent,
               fontSize: 9,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,

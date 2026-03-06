@@ -70,4 +70,25 @@ class SongModel {
       suggestedBy: json['suggestedBy'] as String?,
     );
   }
+
+  SongModel copyWith({int? voteCount}) {
+    return SongModel(
+      id: id,
+      title: title,
+      artist: artist,
+      status: status,
+      addedBy: addedBy,
+      orderIndex: orderIndex,
+      eventId: eventId,
+      voteCount: voteCount ?? this.voteCount,
+      createdAt: createdAt,
+      coverUrl: coverUrl,
+      bpm: bpm,
+      songKey: songKey,
+      songMode: songMode,
+      energy: energy,
+      danceability: danceability,
+      suggestedBy: suggestedBy,
+    );
+  }
 }

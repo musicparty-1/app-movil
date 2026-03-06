@@ -8,6 +8,7 @@ import '../theme.dart';
 import '../widgets/skeleton_loader.dart';
 import 'voting_screen.dart';
 import 'qr_scan_screen.dart';
+import 'upcoming_events_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -64,6 +65,14 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month_rounded),
+            tooltip: 'Próximos eventos',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const UpcomingEventsScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.qr_code_scanner_rounded),
             tooltip: 'Escanear QR del evento',

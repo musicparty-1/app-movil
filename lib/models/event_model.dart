@@ -23,6 +23,9 @@ class EventModel {
   final double? latitude;
   final double? longitude;
 
+  /// Fecha estimada del evento (solo en eventos planificados / draft con scheduledAt)
+  final DateTime? scheduledAt;
+
   const EventModel({
     required this.id,
     required this.name,
@@ -34,6 +37,7 @@ class EventModel {
     this.allowAudienceSuggestions = true,
     this.latitude,
     this.longitude,
+    this.scheduledAt,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -48,6 +52,9 @@ class EventModel {
           json['allowAudienceSuggestions'] as bool? ?? true,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      scheduledAt: json['scheduledAt'] != null
+          ? DateTime.parse(json['scheduledAt'] as String)
+          : null,
       songs: json['songs'] != null
           ? (json['songs'] as List)
               .map((s) => SongModel.fromJson(s as Map<String, dynamic>))

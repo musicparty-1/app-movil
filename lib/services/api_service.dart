@@ -13,10 +13,8 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.baseUrl,
-        connectTimeout:
-            const Duration(seconds: AppConfig.connectTimeoutSec),
-        receiveTimeout:
-            const Duration(seconds: AppConfig.receiveTimeoutSec),
+        connectTimeout: const Duration(seconds: AppConfig.connectTimeoutSec),
+        receiveTimeout: const Duration(seconds: AppConfig.receiveTimeoutSec),
         headers: {'Content-Type': 'application/json'},
       ),
     );
@@ -32,6 +30,20 @@ class ApiService {
         : null;
     final response = await _dio.get<List>(
       '/eventos/publico',
+      queryParameters: queryParams,
+    );
+    return (response.data ?? [])
+        .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// GET /eventos/proximos — eventos planificados con fecha estimada.
+  Future<List<EventModel>> getUpcomingEvents() async {
+    final queryParams = AppConfig.djId.isNotEmpty
+        ? <String, dynamic>{'djId': AppConfig.djId}
+        : null;
+    final response = await _dio.get<List>(
+      '/eventos/proximos',
       queryParameters: queryParams,
     );
     return (response.data ?? [])

@@ -11,6 +11,7 @@ import '../screens/ranking_screen.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/skeleton_loader.dart';
+import '../widgets/suggest_song_sheet.dart';
 
 class VotingScreen extends ConsumerStatefulWidget {
   final String eventId;
@@ -142,6 +143,17 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
         elevation: 0,
         leading: const BackButton(),
         actions: [
+          if (event.allowAudienceSuggestions)
+            IconButton(
+              icon: const Icon(Icons.queue_music_rounded, size: 22),
+              tooltip: 'Sugerir canción',
+              onPressed: () => showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => SuggestSongSheet(eventId: widget.eventId),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.emoji_events_rounded, size: 22),
             tooltip: 'Ranking',
@@ -803,8 +815,7 @@ class _NavItem extends StatelessWidget {
               style: TextStyle(
                 color: color,
                 fontSize: 10,
-                fontWeight:
-                    selected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                 letterSpacing: 0.2,
               ),
             ),
