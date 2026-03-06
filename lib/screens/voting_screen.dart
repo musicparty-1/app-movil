@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/song_model.dart';
 import '../providers/providers.dart';
+import '../screens/now_playing_screen.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/skeleton_loader.dart';
@@ -53,8 +54,7 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
                 const SizedBox(height: 14),
                 const Text(
                   'No se pudo cargar el evento',
-                  style: TextStyle(
-                      color: AppTheme.textSecondary, fontSize: 16),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -144,8 +144,7 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
               Clipboard.setData(ClipboardData(text: event.id));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content:
-                      Text('ID copiado: ${event.id.substring(0, 8)}...'),
+                  content: Text('ID copiado: ${event.id.substring(0, 8)}...'),
                   duration: const Duration(seconds: 2),
                 ),
               );
@@ -169,13 +168,22 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
               ),
             ),
 
-            // Sonando ahora
+            // Sonando ahora (tappable → U3)
             if (nowPlaying != null)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: _NowPlayingBanner(
-                      song: nowPlaying, theme: eventTheme),
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            NowPlayingScreen(eventId: widget.eventId),
+                      ),
+                    ),
+                    child:
+                        _NowPlayingBanner(song: nowPlaying, theme: eventTheme),
+                  ),
                 ),
               ),
 
@@ -201,8 +209,7 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
                         color: eventTheme.accent.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color:
-                                eventTheme.accent.withValues(alpha: 0.35),
+                            color: eventTheme.accent.withValues(alpha: 0.35),
                             width: 0.8),
                       ),
                       child: Text(
@@ -274,18 +281,15 @@ class _VotingScreenState extends ConsumerState<VotingScreen> {
             deviceId: deviceId,
           );
       _markVoted(song.id);
-      ref
-          .read(votingProvider(widget.eventId).notifier)
-          .incrementVote(song.id);
+      ref.read(votingProvider(widget.eventId).notifier).incrementVote(song.id);
     } on DioException catch (e) {
       final is409 = e.response?.statusCode == 409;
       if (is409) _markVoted(song.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(is409
-                ? 'Ya votaste por esta canción'
-                : dioErrorToMessage(e)),
+            content: Text(
+                is409 ? 'Ya votaste por esta canción' : dioErrorToMessage(e)),
             backgroundColor: is409
                 ? AppTheme.neonPurple.withValues(alpha: 0.9)
                 : AppTheme.errorColor,
@@ -490,8 +494,7 @@ class _U2SongRow extends StatelessWidget {
                         child: Text(
                           '${song.voteCount} voto${song.voteCount == 1 ? '' : 's'}',
                           style: TextStyle(
-                            color: eventTheme.accent
-                                .withValues(alpha: 0.85),
+                            color: eventTheme.accent.withValues(alpha: 0.85),
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
@@ -639,8 +642,8 @@ class _NowPlayingBanner extends StatelessWidget {
               color: theme.accent.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.music_note_rounded,
-                color: theme.accent, size: 16),
+            child:
+                Icon(Icons.music_note_rounded, color: theme.accent, size: 16),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -676,7 +679,15 @@ class _NowPlayingBanner extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.graphic_eq_rounded, color: theme.accent, size: 22),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.graphic_eq_rounded, color: theme.accent, size: 22),
+              const SizedBox(width: 6),
+              Icon(Icons.chevron_right_rounded,
+                  color: theme.accent.withValues(alpha: 0.6), size: 18),
+            ],
+          ),
         ],
       ),
     );
