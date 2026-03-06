@@ -8,43 +8,31 @@ import '../widgets/skeleton_loader.dart';
 import 'voting_screen.dart';
 import 'qr_scan_screen.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final _idController = TextEditingController();
-
-  @override
-  void dispose() {
-    _idController.dispose();
-    super.dispose();
-  }
-
-  void _goToEvent(String id) {
-    final trimmed = id.trim();
-    if (trimmed.isEmpty) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => VotingScreen(eventId: trimmed)),
-    );
-  }
-
-  Future<void> _openQrScanner() async {
+  Future<void> _openQr(BuildContext context) async {
     final id = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => const QrScanScreen()),
     );
-    if (id != null && mounted) {
-      _goToEvent(id);
+    if (id != null && context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => VotingScreen(eventId: id)),
+      );
     }
   }
 
+  void _goToEvent(BuildContext context, String id) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => VotingScreen(eventId: id)),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(eventsProvider);
 
     return Scaffold(
@@ -77,71 +65,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner_rounded),
             tooltip: 'Escanear QR del evento',
-            onPressed: _openQrScanner,
+            onPressed: () => _openQr(context),
           ),
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // â”€â”€ Banner de entrada manual â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0x406B3FFF), Color(0x1500F2FF)],
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Vota en el evento 🎵',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _idController,
-                        decoration: const InputDecoration(
-                          hintText: 'ID del evento',
-                          prefixIcon: Icon(
-                            Icons.tag_rounded,
-                            size: 18,
-                            color: Colors.white38,
-                          ),
-                        ),
-                        textInputAction: TextInputAction.go,
-                        onSubmitted: _goToEvent,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => _goToEvent(_idController.text),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                      ),
-                      child: const Text('Ir'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // â”€â”€ TÃ­tulo secciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 6),
             child: Text(
@@ -154,12 +84,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-
-          // â”€â”€ Lista de eventos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Expanded(
             child: eventsAsync.when(
               loading: () => ListView.builder(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 80),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
                 itemCount: 5,
                 itemBuilder: (_, __) => const SkeletonEventCard(),
               ),
@@ -189,30 +117,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               data: (events) {
                 if (events.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.music_off_rounded,
                           size: 52,
                           color: Colors.white12,
                         ),
-                        SizedBox(height: 14),
-                        Text(
+                        const SizedBox(height: 14),
+                        const Text(
                           'No hay eventos activos',
                           style: TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 6),
-                        Text(
-                          'Escanea el QR o ingresa el ID',
-                          style: TextStyle(
-                            color: Colors.white30,
-                            fontSize: 13,
-                          ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Pedile el QR al DJ',
+                          style: TextStyle(color: Colors.white30, fontSize: 13),
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          onPressed: () => _openQr(context),
+                          style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.neonPurple),
+                          icon: const Icon(Icons.qr_code_rounded, size: 18),
+                          label: const Text('Escanear QR'),
                         ),
                       ],
                     ),
@@ -222,14 +155,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 return RefreshIndicator(
                   color: AppTheme.neonPurple,
                   backgroundColor: AppTheme.darkCard,
-                  onRefresh: () =>
-                      ref.read(eventsProvider.notifier).refresh(),
+                  onRefresh: () => ref.read(eventsProvider.notifier).refresh(),
                   child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 80),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
                     itemCount: events.length,
                     itemBuilder: (_, i) => _EventCard(
                       event: events[i],
-                      onTap: () => _goToEvent(events[i].id),
+                      onTap: () => _goToEvent(context, events[i].id),
                     ),
                   ),
                 );
@@ -242,7 +174,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// â”€â”€â”€ Tarjeta de evento â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ignore_for_file: unused_element
 
 class _EventCard extends StatefulWidget {
   final EventModel event;
@@ -273,129 +205,238 @@ class _EventCardState extends State<_EventCard>
     super.dispose();
   }
 
+  String _genreLabel(String? type) {
+    switch (type) {
+      case 'club':
+        return 'Club';
+      case 'wedding':
+        return 'Casamiento';
+      case 'festival':
+        return 'Festival';
+      case 'corporate':
+        return 'Corporativo';
+      case 'private':
+        return 'Privado';
+      default:
+        return 'Evento';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.eventThemeFor(widget.event.eventType);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Material(
-        color: AppTheme.darkCard,
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(18),
           splashColor: theme.accent.withValues(alpha: 0.12),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                // Emoji del tipo de evento
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: theme.accent.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      theme.emoji,
-                      style: const TextStyle(fontSize: 22),
-                    ),
-                  ),
+          child: AnimatedBuilder(
+            animation: _pulse,
+            builder: (_, __) => Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.accent.withValues(alpha: 0.22),
+                    const Color(0xFF0D0D1A),
+                  ],
                 ),
-                const SizedBox(width: 14),
-                // Nombre y venue
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Hero(
-                        tag: 'event-name-${widget.event.id}',
-                        child: Material(
-                          color: Colors.transparent,
-                          child: Text(
-                            widget.event.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.event.venue,
+                border: Border.all(
+                  color: theme.accent.withValues(alpha: 0.28),
+                  width: 1,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  // Emoji watermark
+                  Positioned(
+                    right: 14,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Text(
+                        theme.emoji,
                         style: TextStyle(
-                          color: theme.accent.withValues(alpha: 0.85),
-                          fontSize: 13,
+                          fontSize: 72,
+                          color: Colors.white.withValues(alpha: 0.06),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                // Badge EN VIVO pulsante
-                AnimatedBuilder(
-                  animation: _pulse,
-                  builder: (_, __) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.liveGreen.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: AppTheme.liveGreen.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  // Contenido
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: AppTheme.liveGreen.withValues(
-                              alpha: 0.4 + _pulse.value * 0.6,
-                            ),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.liveGreen.withValues(
-                                  alpha: _pulse.value * 0.5,
+                        // Fila top: EN VIVO + genre badge
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppTheme.liveGreen
+                                    .withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: AppTheme.liveGreen
+                                      .withValues(alpha: 0.35),
                                 ),
-                                blurRadius: 4,
-                                spreadRadius: 1,
                               ),
-                            ],
-                          ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 5,
+                                    height: 5,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.liveGreen.withValues(
+                                        alpha: 0.5 + _pulse.value * 0.5,
+                                      ),
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppTheme.liveGreen.withValues(
+                                              alpha: _pulse.value * 0.6),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    'EN VIVO',
+                                    style: TextStyle(
+                                      color: AppTheme.liveGreen,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.6,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: theme.accent.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color:
+                                      theme.accent.withValues(alpha: 0.35),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                _genreLabel(widget.event.eventType),
+                                style: TextStyle(
+                                  color: theme.accent,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 5),
-                        const Text(
-                          'EN VIVO',
-                          style: TextStyle(
-                            color: AppTheme.liveGreen,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
+                        const Spacer(),
+                        // Fila inferior: nombre + venue + ENTRAR
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Hero(
+                                    tag: 'event-name-${widget.event.id}',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: Text(
+                                        widget.event.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          letterSpacing: -0.3,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on_rounded,
+                                        size: 11,
+                                        color: theme.accent
+                                            .withValues(alpha: 0.75),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Expanded(
+                                        child: Text(
+                                          widget.event.venue,
+                                          style: const TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 12,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            FilledButton(
+                              onPressed: widget.onTap,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: theme.accent,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'ENTRAR',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Colors.white24,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -403,4 +444,3 @@ class _EventCardState extends State<_EventCard>
     );
   }
 }
-

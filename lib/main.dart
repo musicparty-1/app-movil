@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'theme.dart';
-import 'screens/qr_scan_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ class MusicPartyApp extends StatelessWidget {
       title: 'MusicParty',
       theme: AppTheme.dark,
       debugShowCheckedModeBanner: false,
-      home: const QrScanScreen(isHome: true),
+      home: const HomeScreen(),
     );
   }
 }
